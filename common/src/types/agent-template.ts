@@ -1,3 +1,4 @@
+import type { MCPConfig } from './mcp'
 import type { Model } from '../old-constants'
 import type { ToolResultOutput } from './messages/content-part'
 import type { AgentState, AgentTemplateType } from './session-state'
@@ -11,6 +12,7 @@ import type { z } from 'zod/v4'
 
 export type AgentId = `${string}/${string}@${number}.${number}.${number}`
 
+/** Validated AgentTemplate */
 export type AgentTemplate<
   P = string | undefined,
   T = Record<string, any> | undefined,
@@ -20,6 +22,7 @@ export type AgentTemplate<
   model: Model
   reasoningOptions?: OpenRouterProviderOptions['reasoning']
 
+  mcpServers: Record<string, MCPConfig>
   toolNames: (ToolName | (string & {}))[]
   spawnableAgents: AgentTemplateType[]
 

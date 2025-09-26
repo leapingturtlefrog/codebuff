@@ -517,7 +517,7 @@ export async function requestMcpToolData({
 }: {
   ws: WebSocket
   mcpConfig: MCPConfig
-  toolNames: string[] | undefined
+  toolNames: string[] | null
 }): Promise<
   {
     name: string
@@ -551,7 +551,7 @@ export async function requestMcpToolData({
       type: 'request-mcp-tool-data',
       mcpConfig,
       requestId,
-      toolNames,
+      ...(toolNames && { toolNames }),
     })
   })
 }
