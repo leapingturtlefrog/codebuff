@@ -18,6 +18,7 @@ import {
 import { READABLE_NAME } from '@codebuff/common/api-keys/constants'
 import { AnalyticsEvent } from '@codebuff/common/constants/analytics-events'
 import { codebuffConfigFile as CONFIG_FILE_NAME } from '@codebuff/common/json-config/constants'
+import { getMCPClient, listMCPTools } from '@codebuff/common/mcp/client'
 import {
   ASKED_CONFIG,
   CREDITS_REFERRAL_BONUS,
@@ -950,6 +951,28 @@ export class Client {
 
       // Refresh display if we're currently viewing this agent
       refreshSubagentDisplay(agentId)
+    })
+
+    this.webSocket.subscribe('request-mcp-tool-data', async (action) => {
+      const mcpClientId = await getMCPClient(action.mcpConfig)
+      const tools = (await listMCPTools(mcpClientId)).tools
+      const filteredTools: typeof tools = []
+      for (const tool of tools) {
+        if (!action.toolNames) {
+          filteredTools.push(tool)
+          continue
+        }
+        if (tool.name in action.toolNames) {
+          filteredTools.push(tool)
+          continue
+        }
+      }
+
+      sendActionAndHandleError(this.webSocket, {
+        type: 'mcp-tool-data',
+        requestId: action.requestId,
+        tools: filteredTools,
+      })
     })
   }
 

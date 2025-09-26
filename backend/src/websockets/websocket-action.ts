@@ -30,6 +30,7 @@ import type {
   ServerAction,
   UsageResponse,
 } from '@codebuff/common/actions'
+import type { MCPConfig } from '@codebuff/common/types/mcp'
 import type { ToolResultOutput } from '@codebuff/common/types/messages/content-part'
 import type { ClientMessage } from '@codebuff/common/websockets/websocket-schema'
 import type { WebSocket } from 'ws'
@@ -498,6 +499,59 @@ export async function requestToolCall(
       input,
       timeout:
         timeoutInSeconds === undefined ? undefined : timeoutInSeconds * 1000, // Send timeout in milliseconds
+    })
+  })
+}
+
+/**
+ * Requests a tool call execution from the client with timeout support
+ * @param ws - The WebSocket connection
+ * @param mcpConfig - The configuration for the MCP server
+ * @param input - Arguments for the tool (can include timeout)
+ * @returns Promise resolving to the tool execution result
+ */
+export async function requestMcpToolData({
+  ws,
+  mcpConfig,
+  toolNames,
+}: {
+  ws: WebSocket
+  mcpConfig: MCPConfig
+  toolNames: string[] | undefined
+}): Promise<
+  {
+    name: string
+    description?: string
+    inputSchema: unknown
+  }[]
+> {
+  return new Promise((resolve) => {
+    const requestId = generateCompactId()
+
+    // Set up timeout
+    const timeoutHandle = setTimeout(
+      () => {
+        unsubscribe()
+        resolve([])
+      },
+      45_000 + 5000, // Convert to ms and add a small buffer
+    )
+
+    // Subscribe to response
+    const unsubscribe = subscribeToAction('mcp-tool-data', (action) => {
+      if (action.requestId === requestId) {
+        clearTimeout(timeoutHandle)
+        unsubscribe()
+        resolve(action.tools)
+      }
+    })
+
+    // Send the request
+    sendAction(ws, {
+      type: 'request-mcp-tool-data',
+      mcpConfig,
+      requestId,
+      toolNames,
     })
   })
 }
