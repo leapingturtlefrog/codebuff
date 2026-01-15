@@ -107,7 +107,7 @@ export const Navbar = () => {
             >
               <DropdownMenuItem asChild>
                 <Link
-                  href="/docs/help/quick-start"
+                  href={`/docs/help/quick-start`}
                   className="flex items-center cursor-pointer transition-colors"
                 >
                   <BookHeart className="mr-2 h-4 w-4" />
