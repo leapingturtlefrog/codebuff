@@ -46,7 +46,7 @@ export const Navbar = () => {
         </Link>
         <nav className="hidden md:flex items-center space-x-1 ml-auto">
           <Link
-            href={`/docs`}
+            href="/docs/help/quick-start"
             className="relative font-medium px-3 py-2 rounded-md transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
           >
             <span className="relative z-10">Docs</span>
@@ -107,7 +107,7 @@ export const Navbar = () => {
             >
               <DropdownMenuItem asChild>
                 <Link
-                  href="/docs"
+                  href="/docs/help/quick-start"
                   className="flex items-center cursor-pointer transition-colors"
                 >
                   <BookHeart className="mr-2 h-4 w-4" />
